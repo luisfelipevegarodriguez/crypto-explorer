@@ -1,0 +1,39 @@
+name: Tarea
+description: Un cambio acotado en el explorador o en su tooling.
+title: "Tarea: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Una tarea, un resultado. El proyecto sigue en Vercel Hobby, una región y sin servicios de pago.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: Qué tiene que quedar hecho.
+    validations:
+      required: true
+  - type: textarea
+    id: hecho
+    attributes:
+      label: Criterios de hecho
+      description: Cómo se comprueba.
+      placeholder: |
+        - npm run lint
+        - npm run build
+    validations:
+      required: true
+  - type: textarea
+    id: alcance
+    attributes:
+      label: Fuera de alcance
+      description: Qué no hay que tocar.
+  - type: checkboxes
+    id: restricciones
+    attributes:
+      label: Restricciones
+      options:
+        - label: Sigue en Vercel Hobby, una sola región, sin servicios de pago
+          required: true
+        - label: No se commitean secretos
+          required: true
