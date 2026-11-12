@@ -1,17 +1,24 @@
-import { NextRequest } from 'next/server'
+import { getBlock } from '@/lib/blocks'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(
-  _req: NextRequest,
-  { params }: { params: { height: string } }
+  _req: Request,
+  context: { params: Promise<{ height: string }> }
 ) {
-  const { height } = params
-  const apiKey = process.env.CRYPTOAPIS_API_KEY!
+  const { height } = await context.params
+  const result = await getBlock(height)
 
-  const res = await fetch(
-    `https://rest.cryptoapis.io/v2/blockchain-data/bitcoin/mainnet/blocks/height/${height}`,
-    { headers: { 'X-API-Key': apiKey, Accept: 'application/json' } }
-  )
+  if (!result.block) {
+    return Response.json(
+      { demo: result.demo, message: result.message, data: { item: null } },
+      { status: 404 }
+    )
+  }
 
-  const data = await res.json()
-  return Response.json(data, { status: res.status })
+  return Response.json({
+    demo: result.demo,
+    message: result.message,
+    data: { item: result.block },
+  })
 }
