@@ -1,18 +1,28 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+
+# Dedicated Hobby project. crypto-explorer.vercel.app belongs to another account.
+PROJECT_SLUG="luisfelipevegarodriguez-block-explorer"
 
 echo "📦 Instalando dependencias..."
 npm install
 
-echo "🔑 Verificando API Key..."
-[ -z "$CRYPTOAPIS_API_KEY" ] && echo "❌ Falta CRYPTOAPIS_API_KEY en .env.local" && exit 1
+if [ -z "${CRYPTOAPIS_API_KEY:-}" ] || [ "${CRYPTOAPIS_API_KEY}" = "your_api_key_here" ]; then
+  echo "ℹ️  Sin CRYPTOAPIS_API_KEY real: build en modo demo (no falla)."
+  unset CRYPTOAPIS_API_KEY
+else
+  echo "🔑 CRYPTOAPIS_API_KEY presente."
+fi
 
 echo "🏗️  Build de producción..."
 npm run build
 
-echo "🚀 Deploy a Vercel..."
-npx vercel --prod \
-  -e CRYPTOAPIS_API_KEY="$CRYPTOAPIS_API_KEY" \
-  --yes
+echo "🚀 Deploy a Vercel project: ${PROJECT_SLUG}"
+DEPLOY_ARGS=(--prod --yes --project "$PROJECT_SLUG")
+if [ -n "${CRYPTOAPIS_API_KEY:-}" ]; then
+  DEPLOY_ARGS+=(-e "CRYPTOAPIS_API_KEY=${CRYPTOAPIS_API_KEY}")
+fi
 
-echo "✅ Deploy completado"
+npx vercel "${DEPLOY_ARGS[@]}"
+
+echo "✅ Deploy completado: https://${PROJECT_SLUG}.vercel.app"
